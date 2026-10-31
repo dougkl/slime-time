@@ -1,0 +1,48 @@
+# Sample: the basic cartoon tiles. Add as a Manual card (paste this YAML).
+# The dashboard must contain button_card_templates/slime_templates.yaml.
+
+type: grid
+columns: 2
+square: false
+cards:
+- type: custom:button-card
+  template: slime_light
+  entity: light.living_room
+  name: Living Room
+- type: custom:button-card
+  template: slime_light
+  entity: light.kitchen
+  name: Kitchen
+- type: custom:button-card
+  template: slime_switch
+  entity: switch.coffee_maker
+  name: Coffee Maker
+- type: custom:button-card
+  template: slime_fan
+  entity: fan.bedroom
+  name: Bedroom Fan
+  variables:
+    icon: fan
+- type: custom:button-card
+  template: slime_guard
+  entity: lock.front_door
+  name: Front Door
+- type: custom:button-card
+  template: slime_guard
+  entity: cover.garage_door
+  name: Garage
+  variables:
+    icon: garage
+    icon_alt: garage
+- type: custom:button-card
+  template: slime_sensor
+  entity: sensor.living_room_temperature
+  name: Living Room
+  variables:
+    icon: thermo
+- type: custom:button-card
+  template: slime_sensor
+  entity: sensor.living_room_humidity
+  name: Humidity
+  variables:
+    icon: drop

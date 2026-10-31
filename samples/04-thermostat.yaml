@@ -1,0 +1,285 @@
+# Sample: cartoon thermostat (dial, big set-point, +/- buttons, mode/fan/eco pills) and a temperature graph.
+# Replace climate.living_room / sensor.living_room_temperature. Assumes hvac modes heat/cool/heat_cool/off,
+# fan modes on/off and an "eco" preset; delete pills your thermostat does not support.
+# The graph needs mini-graph-card.
+
+type: vertical-stack
+cards:
+- type: custom:button-card
+  entity: climate.living_room
+  show_icon: false
+  show_name: false
+  show_state: false
+  tap_action:
+    action: none
+  hold_action:
+    action: more-info
+  custom_fields:
+    title: '[[[ return ''<span class="t">'' + (entity.attributes.friendly_name || ''Thermostat'') + ''</span>''; ]]]'
+    action: '[[[ const a = entity.attributes.hvac_action || entity.state; if (a === ''heating'') return ''<span class="badge hot"><span class="ico wiggle" style="width:18px;height:18px;-webkit-mask:url(/local/slime-icons/flame.svg?v=1) center/contain no-repeat;mask:url(/local/slime-icons/flame.svg?v=1) center/contain no-repeat"></span>Heating!</span>''; if (a === ''cooling'') return ''<span class="badge cold"><span class="ico whirl" style="width:18px;height:18px;-webkit-mask:url(/local/slime-icons/snow.svg?v=1) center/contain no-repeat;mask:url(/local/slime-icons/snow.svg?v=1) center/contain no-repeat"></span>Cooling!</span>''; if (entity.state === ''off'') return ''<span class="badge"><span class="ico " style="width:18px;height:18px;-webkit-mask:url(/local/slime-icons/sleep.svg?v=1) center/contain no-repeat;mask:url(/local/slime-icons/sleep.svg?v=1) center/contain no-repeat"></span>Off</span>''; return ''<span class="badge">Idle</span>''; ]]]'
+    dial: |-
+      [[[
+        const a = entity.attributes, mode = entity.state;
+        const min = a.min_temp ?? 50, max = a.max_temp ?? 90;
+        const S = 135, SW = 270, cx = 120, cy = 116, r = 90;
+        const ang = v => S + SW * Math.max(0, Math.min(1, (v - min) / (max - min)));
+        const pt = d => [cx + r * Math.cos(d * Math.PI / 180), cy + r * Math.sin(d * Math.PI / 180)];
+        const arc = (a0, a1) => { const p0 = pt(a0), p1 = pt(a1); return 'M' + p0[0].toFixed(1) + ' ' + p0[1].toFixed(1) + ' A' + r + ' ' + r + ' 0 ' + ((a1 - a0) > 180 ? 1 : 0) + ' 1 ' + p1[0].toFixed(1) + ' ' + p1[1].toFixed(1); };
+        const col = mode === 'cool' ? 'var(--slime-scene-3)' : mode === 'heat' ? 'var(--slime-alert-bg)' : 'var(--slime-on-bg)';
+        const knob = v => { const k = pt(ang(v)); return '<circle cx="' + k[0].toFixed(1) + '" cy="' + k[1].toFixed(1) + '" r="12" fill="var(--slime-tile-text)" stroke="var(--slime-ink)" stroke-width="4"/>'; };
+        let svg = '<path d="' + arc(S, S + SW) + '" stroke="var(--slime-ink)" stroke-width="28" fill="none" stroke-linecap="round"/>'
+                + '<path d="' + arc(S, S + SW) + '" stroke="var(--slime-bubble-bg)" stroke-width="19" fill="none" stroke-linecap="round"/>';
+        let big = '', sub = '';
+        if (mode === 'off') { big = '<span class="big dim">OFF</span>'; sub = 'Thermostat is off'; }
+        else if (a.temperature == null && a.target_temp_low != null) {
+          svg += '<path d="' + arc(ang(a.target_temp_low), ang(a.target_temp_high)) + '" stroke="' + col + '" stroke-width="19" fill="none" stroke-linecap="round"/>' + knob(a.target_temp_low) + knob(a.target_temp_high);
+          big = '<span class="big small">' + Math.round(a.target_temp_low) + '–' + Math.round(a.target_temp_high) + '°</span>'; sub = 'Keep between';
+        } else if (a.temperature != null) {
+          const t = ang(a.temperature);
+          if (t - S > 1) svg += '<path d="' + arc(S, t) + '" stroke="' + col + '" stroke-width="19" fill="none" stroke-linecap="round"/>';
+          svg += knob(a.temperature);
+          big = '<span class="big">' + Math.round(a.temperature) + '<sup>°</sup></span>';
+          sub = mode === 'cool' ? 'Cool to' : mode === 'heat' ? 'Heat to' : 'Set to';
+        }
+        if (a.current_temperature != null) { const c = pt(ang(a.current_temperature)); svg += '<circle cx="' + c[0].toFixed(1) + '" cy="' + c[1].toFixed(1) + '" r="6" fill="var(--slime-on-icon)" stroke="var(--slime-ink)" stroke-width="2.5"/>'; }
+        return '<div class="dial"><svg viewBox="0 0 240 212" width="240" height="212" aria-hidden="true">' + svg + '</svg>'
+             + '<div class="center"><div class="sub">' + sub + '</div>' + big + '</div></div>';
+      ]]]
+    minus:
+      card:
+        type: custom:button-card
+        template: slime_round_btn
+        entity: climate.living_room
+        name: −
+        tap_action:
+          action: perform-action
+          perform_action: climate.set_temperature
+          target:
+            entity_id: climate.living_room
+          data:
+            temperature: '[[[ const a = entity.attributes; const base = (a.temperature != null ? a.temperature : a.current_temperature); return Math.max(a.min_temp, Math.min(a.max_temp, Math.round(base + (-1)))); ]]]'
+        hold_action:
+          action: more-info
+    now: '[[[ const a = entity.attributes; return ''<span class="chip"><span class="ico " style="width:18px;height:18px;-webkit-mask:url(/local/slime-icons/thermo.svg?v=1) center/contain no-repeat;mask:url(/local/slime-icons/thermo.svg?v=1) center/contain no-repeat"></span>'' + (a.current_temperature ?? ''–'') + ''°</span>'' + (a.current_humidity != null ? ''<span class="chip"><span class="ico " style="width:18px;height:18px;-webkit-mask:url(/local/slime-icons/drop.svg?v=1) center/contain no-repeat;mask:url(/local/slime-icons/drop.svg?v=1) center/contain no-repeat"></span>'' + Math.round(a.current_humidity) + ''%</span>'' : ''''); ]]]'
+    plus:
+      card:
+        type: custom:button-card
+        template: slime_round_btn
+        entity: climate.living_room
+        name: +
+        tap_action:
+          action: perform-action
+          perform_action: climate.set_temperature
+          target:
+            entity_id: climate.living_room
+          data:
+            temperature: '[[[ const a = entity.attributes; const base = (a.temperature != null ? a.temperature : a.current_temperature); return Math.max(a.min_temp, Math.min(a.max_temp, Math.round(base + (1)))); ]]]'
+        hold_action:
+          action: more-info
+    modes:
+      card:
+        type: grid
+        columns: 4
+        square: false
+        cards:
+        - type: custom:button-card
+          template: slime_pill
+          entity: climate.living_room
+          name: Heat
+          tap_action:
+            action: perform-action
+            perform_action: climate.set_hvac_mode
+            target:
+              entity_id: climate.living_room
+            data:
+              hvac_mode: heat
+          styles:
+            card:
+            - background: '[[[ return (entity.state === ''heat'') ? ''var(--slime-on-bg)'' : ''var(--slime-bubble-bg)''; ]]]'
+            name:
+            - color: '[[[ return (entity.state === ''heat'') ? ''var(--slime-on-icon)'' : ''var(--slime-tile-text)''; ]]]'
+        - type: custom:button-card
+          template: slime_pill
+          entity: climate.living_room
+          name: Cool
+          tap_action:
+            action: perform-action
+            perform_action: climate.set_hvac_mode
+            target:
+              entity_id: climate.living_room
+            data:
+              hvac_mode: cool
+          styles:
+            card:
+            - background: '[[[ return (entity.state === ''cool'') ? ''var(--slime-on-bg)'' : ''var(--slime-bubble-bg)''; ]]]'
+            name:
+            - color: '[[[ return (entity.state === ''cool'') ? ''var(--slime-on-icon)'' : ''var(--slime-tile-text)''; ]]]'
+        - type: custom:button-card
+          template: slime_pill
+          entity: climate.living_room
+          name: Auto
+          tap_action:
+            action: perform-action
+            perform_action: climate.set_hvac_mode
+            target:
+              entity_id: climate.living_room
+            data:
+              hvac_mode: heat_cool
+          styles:
+            card:
+            - background: '[[[ return (entity.state === ''heat_cool'') ? ''var(--slime-on-bg)'' : ''var(--slime-bubble-bg)''; ]]]'
+            name:
+            - color: '[[[ return (entity.state === ''heat_cool'') ? ''var(--slime-on-icon)'' : ''var(--slime-tile-text)''; ]]]'
+        - type: custom:button-card
+          template: slime_pill
+          entity: climate.living_room
+          name: 'Off'
+          tap_action:
+            action: perform-action
+            perform_action: climate.set_hvac_mode
+            target:
+              entity_id: climate.living_room
+            data:
+              hvac_mode: 'off'
+          styles:
+            card:
+            - background: '[[[ return (entity.state === ''off'') ? ''var(--slime-on-bg)'' : ''var(--slime-bubble-bg)''; ]]]'
+            name:
+            - color: '[[[ return (entity.state === ''off'') ? ''var(--slime-on-icon)'' : ''var(--slime-tile-text)''; ]]]'
+    extras:
+      card:
+        type: grid
+        columns: 4
+        square: false
+        cards:
+        - type: custom:button-card
+          template: slime_pill
+          entity: climate.living_room
+          name: Fan On
+          tap_action:
+            action: perform-action
+            perform_action: climate.set_fan_mode
+            target:
+              entity_id: climate.living_room
+            data:
+              fan_mode: 'on'
+          styles:
+            card:
+            - background: '[[[ return (entity.attributes[''fan_mode''] === ''on'') ? ''var(--slime-on-bg)'' : ''var(--slime-bubble-bg)''; ]]]'
+            name:
+            - color: '[[[ return (entity.attributes[''fan_mode''] === ''on'') ? ''var(--slime-on-icon)'' : ''var(--slime-tile-text)''; ]]]'
+        - type: custom:button-card
+          template: slime_pill
+          entity: climate.living_room
+          name: Fan Off
+          tap_action:
+            action: perform-action
+            perform_action: climate.set_fan_mode
+            target:
+              entity_id: climate.living_room
+            data:
+              fan_mode: 'off'
+          styles:
+            card:
+            - background: '[[[ return (entity.attributes[''fan_mode''] === ''off'') ? ''var(--slime-on-bg)'' : ''var(--slime-bubble-bg)''; ]]]'
+            name:
+            - color: '[[[ return (entity.attributes[''fan_mode''] === ''off'') ? ''var(--slime-on-icon)'' : ''var(--slime-tile-text)''; ]]]'
+        - type: custom:button-card
+          template: slime_pill
+          entity: climate.living_room
+          name: Eco
+          tap_action:
+            action: perform-action
+            perform_action: climate.set_preset_mode
+            target:
+              entity_id: climate.living_room
+            data:
+              preset_mode: '[[[ return entity.attributes.preset_mode === ''eco'' ? ''none'' : ''eco''; ]]]'
+          styles:
+            card:
+            - background: '[[[ return (entity.attributes[''preset_mode''] === ''eco'') ? ''var(--slime-on-bg)'' : ''var(--slime-bubble-bg)''; ]]]'
+            name:
+            - color: '[[[ return (entity.attributes[''preset_mode''] === ''eco'') ? ''var(--slime-on-icon)'' : ''var(--slime-tile-text)''; ]]]'
+        - type: custom:button-card
+          template: slime_pill
+          entity: climate.living_room
+          name: More
+          tap_action:
+            action: more-info
+  styles:
+    grid:
+    - grid-template-areas: '"title title action" "dial dial dial" "minus now plus" "modes modes modes" "extras extras extras"'
+    - grid-template-columns: 64px minmax(0, 1fr) 64px
+    - row-gap: 12px
+    - align-items: center
+    card:
+    - padding: 18px 16px 18px
+    custom_fields:
+      title:
+      - justify-self: start
+      action:
+      - justify-self: end
+      dial:
+      - justify-self: center
+      - margin: -4px 0 -14px
+      minus:
+      - justify-self: start
+      plus:
+      - justify-self: end
+      now:
+      - justify-self: center
+      modes:
+      - width: 100%
+      extras:
+      - width: 100%
+  extra_styles: |2
+
+    @keyframes wiggle { 0%,100% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } }
+    @keyframes whirl { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .ico { animation: none !important; } }
+    .ico { display: inline-block; background: currentColor; flex: none; }
+    .ico.wiggle { animation: wiggle .6s ease-in-out infinite; }
+    .ico.whirl { animation: whirl 2s linear infinite; }
+    .t { font-family: "Luckiest Guy", Nunito, sans-serif; font-size: 24px; letter-spacing: .5px; color: var(--slime-tile-text); }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; margin: 0 4px 4px 0; border: 3px solid var(--slime-ink);
+      border-radius: 999px; box-shadow: 2px 2px 0 var(--slime-ink); background: var(--slime-bubble-bg);
+      font-family: "Luckiest Guy", Nunito, sans-serif; font-size: 14px; letter-spacing: .5px; color: var(--slime-tile-text); }
+    .badge.hot { background: var(--slime-alert-bg); }
+    .badge.cold { background: var(--slime-scene-3); }
+    .dial { position: relative; width: 240px; height: 212px; }
+    .dial .center { position: absolute; left: 0; right: 0; top: 62px; display: flex; flex-direction: column; align-items: center; }
+    .dial .sub { font-family: "Luckiest Guy", Nunito, sans-serif; font-size: 14px; letter-spacing: .5px; color: var(--slime-tile-text); opacity: .75; }
+    .big { font-family: "Luckiest Guy", Nunito, sans-serif; font-size: 76px; line-height: .95; color: var(--slime-tile-text);
+      display: inline-block; transform: rotate(-2deg); text-shadow: 4px 4px 0 var(--slime-ink); }
+    .big sup { font-size: 32px; vertical-align: top; }
+    .big.small { font-size: 46px; }
+    .big.dim { font-size: 52px; opacity: .7; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; margin: 0 3px; padding: 4px 12px; border-radius: 999px;
+      border: 2px solid var(--slime-ink); background: var(--slime-bubble-bg); font-weight: 900; font-size: 15px;
+      color: var(--slime-tile-text); }
+- type: custom:mini-graph-card
+  name: Temperature today
+  icon: slime:thermo
+  entities:
+  - entity: sensor.living_room_temperature
+    name: Inside
+  hours_to_show: 24
+  points_per_hour: 2
+  line_width: 6
+  smoothing: true
+  font_size: 90
+  decimals: 1
+  animate: true
+  color_thresholds:
+  - value: 64
+    color: '#4FB3D9'
+  - value: 68
+    color: '#7DCB1A'
+  - value: 72
+    color: '#E07A1F'
+  show:
+    fill: fade
+    points: false
+    labels: true
+    extrema: true
+    legend: false

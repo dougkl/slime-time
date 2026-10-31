@@ -1,0 +1,371 @@
+# Slime Time button-card templates
+# Paste the `button_card_templates:` block at the TOP of your dashboard's raw configuration
+# (Dashboard > Edit > three dots > Raw configuration editor). Every sample in /samples uses these.
+#
+#   slime_tile       base cartoon tile (outline, wobbly corners, sticker shadow, icon bubble)
+#   slime_light      light or light group; turns slime-green and bounces when on; "2 of 4 on" for groups
+#   slime_switch     outlet / switch
+#   slime_fan        fan; icon spins when on
+#   slime_guard      lock or garage/cover; green when safe, orange + wiggle when unlocked/open
+#   slime_sensor     temperature / humidity reading with big cartoon numbers
+#   slime_row        full-width toggle row with a chunky ON/OFF pill (lights, switches, media players)
+#   slime_scene      quick-action button
+#   slime_pill       small pill button (used by the thermostat)
+#   slime_round_btn  round +/- button (used by the thermostat)
+
+button_card_templates:
+  slime_tile:
+    show_name: true
+    show_state: true
+    tap_action:
+      action: toggle
+    hold_action:
+      action: more-info
+    styles:
+      grid:
+      - grid-template-columns: 1fr
+      - grid-template-rows: min-content min-content min-content
+      - justify-items: start
+      - grid-template-areas: '"ico" "n" "s"'
+      card:
+      - padding: 14px
+      - min-height: 118px
+      - background: var(--slime-tile-bg)
+      - color: var(--slime-tile-text)
+      - border: 3px solid var(--slime-ink)
+      - border-radius: 22px 16px 24px 14px
+      - box-shadow: 5px 5px 0 var(--slime-ink)
+      - font-family: Nunito, system-ui, sans-serif
+      - transition: background 0.2s
+      - transform: '[[[ const id = (entity && entity.entity_id) || ''''; let h = 0; for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) % 997; return ''rotate('' + ((h % 5) - 2) * 0.6 + ''deg)''; ]]]'
+      name:
+      - font-weight: 900
+      - font-size: 16px
+      - justify-self: start
+      - margin-top: 10px
+      state:
+      - font-family: '"Luckiest Guy", cursive'
+      - font-size: 18px
+      - letter-spacing: 0.5px
+      - justify-self: start
+      - text-transform: capitalize
+      custom_fields:
+        ico:
+        - width: 46px
+        - height: 46px
+        - box-sizing: border-box
+        - display: flex
+        - align-items: center
+        - justify-content: center
+        - background: var(--slime-bubble-bg)
+        - border: 3px solid var(--slime-ink)
+        - border-radius: 50%
+        - color: var(--slime-icon)
+    extra_styles: |
+      @keyframes boing {
+        0%,100% { transform: translateY(0) scale(1,1); }
+        30%     { transform: translateY(-6px) scale(.9,1.1); }
+        55%     { transform: translateY(0) scale(1.1,.9); }
+        75%     { transform: translateY(-2px) scale(1,1); }
+      }
+      @keyframes whirl  { to { transform: rotate(360deg); } }
+      @keyframes wiggle { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+      .slime-ico { display: block; width: 28px; height: 28px; background: currentColor; }
+      .slime-ico.boing { animation: boing 1.3s ease-in-out infinite; transform-origin: 50% 100%; }
+      .slime-ico.whirl { animation: whirl 1s linear infinite; }
+      .slime-ico.wiggle { animation: wiggle 0.6s ease-in-out infinite; }
+      @media (prefers-reduced-motion: reduce) { .slime-ico { animation: none !important; } }
+    show_icon: false
+    variables:
+      icon: bulb
+    custom_fields:
+      ico: |-
+        [[[
+          const s = entity ? entity.state : '';
+          const alt = ['on', 'unlocked', 'open'].includes(s);
+          const name = (alt && variables.icon_alt) ? variables.icon_alt : variables.icon;
+          let anim = '';
+          if (variables.anim_on && s === 'on') anim = variables.anim_on;
+          if (['unlocked', 'open'].includes(s)) anim = 'wiggle';
+          const url = '/local/slime-icons/' + name + '.svg?v=1';
+          return '<span class="slime-ico ' + anim + '" style="-webkit-mask:url(' + url + ') center/contain no-repeat;mask:url(' + url + ') center/contain no-repeat"></span>';
+        ]]]
+  slime_light:
+    template: slime_tile
+    show_label: true
+    label: |-
+      [[[
+        const ids = entity.attributes.entity_id;
+        if (Array.isArray(ids)) {
+          const on = ids.filter(id => states[id] && states[id].state === 'on').length;
+          return on + ' of ' + ids.length + ' on';
+        }
+        if (entity.state === 'on' && entity.attributes.brightness != null) return Math.round(entity.attributes.brightness / 2.55) + '% bright';
+        return '';
+      ]]]
+    styles:
+      grid:
+      - grid-template-rows: min-content min-content min-content min-content
+      - grid-template-areas: '"ico" "n" "s" "l"'
+      label:
+      - font-weight: 800
+      - font-size: 13px
+      - justify-self: start
+      - opacity: 0.8
+    state:
+    - value: 'on'
+      styles:
+        card:
+        - background: var(--slime-on-bg)
+        custom_fields:
+          ico:
+          - color: var(--slime-on-icon)
+    variables:
+      icon: bulb
+      icon_alt: bulb-on
+      anim_on: boing
+  slime_fan:
+    template: slime_tile
+    state:
+    - value: 'on'
+      styles:
+        card:
+        - background: var(--slime-on-bg)
+        custom_fields:
+          ico:
+          - color: var(--slime-on-icon)
+    variables:
+      icon: fan
+      anim_on: whirl
+  slime_guard:
+    template: slime_tile
+    tap_action:
+      action: more-info
+    state:
+    - value: locked
+      styles:
+        card:
+        - background: var(--slime-on-bg)
+        custom_fields:
+          ico:
+          - color: var(--slime-on-icon)
+    - value: closed
+      styles:
+        card:
+        - background: var(--slime-on-bg)
+        custom_fields:
+          ico:
+          - color: var(--slime-on-icon)
+    - value: unlocked
+      styles:
+        card:
+        - background: var(--slime-alert-bg)
+        custom_fields:
+          ico:
+          - color: var(--slime-tile-text)
+    - value: open
+      styles:
+        card:
+        - background: var(--slime-alert-bg)
+        custom_fields:
+          ico:
+          - color: var(--slime-tile-text)
+    variables:
+      icon: lock
+      icon_alt: lock-open
+  slime_scene:
+    show_icon: false
+    show_name: true
+    tap_action:
+      action: perform-action
+      perform_action: scene.turn_on
+      target:
+        entity_id: entity
+    styles:
+      card:
+      - min-height: 48px
+      - padding: 6px
+      - border: 3px solid var(--slime-ink)
+      - box-shadow: 4px 4px 0 var(--slime-ink)
+      - color: var(--slime-scene-text)
+      name:
+      - font-family: '"Luckiest Guy", cursive'
+      - font-size: 16px
+      - letter-spacing: 0.5px
+      - color: var(--slime-scene-text)
+  slime_switch:
+    template: slime_tile
+    variables:
+      icon: plug
+      anim_on: boing
+    state:
+    - value: 'on'
+      styles:
+        card:
+        - background: var(--slime-on-bg)
+        custom_fields:
+          ico:
+          - color: var(--slime-on-icon)
+  slime_row:
+    template: slime_tile
+    show_state: false
+    show_label: true
+    tap_action:
+      action: toggle
+    hold_action:
+      action: more-info
+    variables:
+      icon: null
+    custom_fields:
+      ico: |-
+        [[[
+          const s = entity ? entity.state : '';
+          const dom = entity ? entity.entity_id.split('.')[0] : '';
+          const on = !['off', 'unavailable', 'unknown', 'standby'].includes(entity.state);
+          let name = variables.icon;
+          if (!name) {
+            if (dom === 'light') name = on ? 'bulb-on' : 'bulb';
+            else if (dom === 'media_player') {
+              const a = entity.attributes, fn = (a.friendly_name || '');
+              name = (a.device_class === 'tv' || /tv|shield|chromecast|oled/i.test(fn)) ? 'tv' : 'speaker';
+            } else name = 'plug';
+          }
+          const anim = on && dom !== 'media_player' ? 'boing' : '';
+          const url = '/local/slime-icons/' + name + '.svg?v=1';
+          return '<span class="slime-ico ' + anim + '" style="-webkit-mask:url(' + url + ') center/contain no-repeat;mask:url(' + url + ') center/contain no-repeat"></span>';
+        ]]]
+      pill: |-
+        [[[
+          const bad = ['unavailable', 'unknown'].includes(entity.state);
+          const on = !['off', 'unavailable', 'unknown', 'standby'].includes(entity.state);
+          const txt = bad ? '?' : (on ? 'ON' : 'OFF');
+          return '<span class="pill' + (on ? ' on' : '') + '"><span class="knob"></span><span class="txt">' + txt + '</span></span>';
+        ]]]
+    styles:
+      grid:
+      - grid-template-areas: '"ico n pill" "ico l pill"'
+      - grid-template-columns: 46px minmax(0, 1fr) auto
+      - grid-template-rows: auto auto
+      - column-gap: 14px
+      - align-items: center
+      - justify-items: start
+      card:
+      - min-height: 66px
+      - padding: 10px 14px
+      - transform: none
+      - border-radius: 20px 14px 22px 12px
+      name:
+      - margin-top: '0'
+      - font-size: 17px
+      - font-weight: '900'
+      - color: var(--slime-tile-text)
+      - white-space: nowrap
+      - overflow: hidden
+      - text-overflow: ellipsis
+      - max-width: 100%
+      custom_fields:
+        pill:
+        - justify-self: end
+        ico:
+        - grid-row: 1 / 3
+      label:
+      - font-size: 13px
+      - font-weight: '700'
+      - opacity: '.8'
+      - color: var(--slime-tile-text)
+      - white-space: nowrap
+      - overflow: hidden
+      - text-overflow: ellipsis
+      - max-width: 100%
+      - justify-self: start
+    state:
+    - operator: template
+      value: '[[[ return ![''off'', ''unavailable'', ''unknown'', ''standby''].includes(entity.state); ]]]'
+      styles:
+        card:
+        - background: var(--slime-on-bg)
+        custom_fields:
+          ico:
+          - color: var(--slime-on-icon)
+    extra_styles: |2
+
+      .pill { display: inline-flex; align-items: center; gap: 6px; min-width: 78px; height: 34px;
+        padding: 0 12px 0 4px; box-sizing: border-box; border: 3px solid var(--slime-ink); border-radius: 999px;
+        background: var(--slime-bubble-bg); box-shadow: 2px 2px 0 var(--slime-ink);
+        font-family: "Luckiest Guy", Nunito, sans-serif; font-size: 15px; letter-spacing: .5px;
+        color: var(--slime-tile-text); transition: all .2s ease; }
+      .pill .knob { width: 22px; height: 22px; flex: none; border-radius: 50%; box-sizing: border-box;
+        background: var(--slime-icon); border: 2px solid var(--slime-ink); }
+      .pill.on { flex-direction: row-reverse; padding: 0 4px 0 12px; color: var(--slime-on-icon); }
+      .pill.on .knob { background: var(--slime-on-icon); }
+    label: |-
+      [[[
+        const a = entity.attributes;
+        if (entity.entity_id.startsWith('media_player.')) {
+          if (entity.state === 'playing' || entity.state === 'paused') {
+            const t = [a.media_title, a.media_artist || a.app_name].filter(Boolean).join(' · ');
+            return (entity.state === 'paused' ? 'Paused · ' : '') + (t || 'Playing');
+          }
+          if (a.source && entity.state === 'on') return a.source;
+          return entity.state.charAt(0).toUpperCase() + entity.state.slice(1);
+        }
+        return '';
+      ]]]
+  slime_pill:
+    show_icon: false
+    show_state: false
+    show_name: true
+    hold_action:
+      action: more-info
+    styles:
+      card:
+      - height: 46px
+      - padding: 0 4px
+      - border-radius: 999px
+      - border: 3px solid var(--slime-ink)
+      - box-shadow: 3px 3px 0 var(--slime-ink)
+      - background: var(--slime-bubble-bg)
+      - transition: background .2s
+      - width: calc(100% - 5px)
+      - margin: 0 5px 5px 0
+      - box-sizing: border-box
+      name:
+      - font-family: '"Luckiest Guy", Nunito, sans-serif'
+      - font-size: 14px
+      - letter-spacing: .3px
+      - color: var(--slime-tile-text)
+      - white-space: nowrap
+  slime_round_btn:
+    show_icon: false
+    show_state: false
+    show_name: true
+    styles:
+      card:
+      - width: 56px
+      - height: 56px
+      - border-radius: 50%
+      - padding: '0'
+      - border: 3px solid var(--slime-ink)
+      - box-shadow: 3px 3px 0 var(--slime-ink)
+      - background: var(--slime-bubble-bg)
+      - margin: 0 5px 5px 0
+      - box-sizing: border-box
+      name:
+      - font-family: '"Luckiest Guy", Nunito, sans-serif'
+      - font-size: 34px
+      - line-height: '1'
+      - color: var(--slime-tile-text)
+      - padding-top: 4px
+  slime_sensor:
+    template: slime_tile
+    tap_action:
+      action: more-info
+    hold_action:
+      action: more-info
+    styles:
+      card:
+      - min-height: 104px
+      state:
+      - font-size: 22px
+      - text-transform: none

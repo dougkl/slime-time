@@ -1,0 +1,200 @@
+# Sample: full "Slime Time" home dashboard (header with slime drips, quick actions, room tiles, lock, thermostat)
+# Needs: themes/slime_time.yaml, button_card_templates/slime_templates.yaml, the icons, the fonts resource.
+# Replace the example entity ids (light.living_room, lock.front_door, ...) with your own.
+
+title: Slime Time
+views:
+- title: Home
+  path: home
+  icon: mdi:home-heart
+  cards:
+  - type: vertical-stack
+    cards:
+    - type: custom:button-card
+      name: Hey there!
+      show_icon: false
+      show_label: true
+      tap_action:
+        action: none
+      label: |
+        [[[
+          const rooms = ['light.living_room','light.kitchen','light.bedroom',
+                         'light.office','light.basement','light.stairs'];
+          const lit = rooms.filter(id => states[id] && states[id].state === 'on').length;
+          const door = states['lock.front_door'];
+          const warn = door && door.state !== 'locked';
+          return (lit === 0 ? 'All dark in here' : lit + (lit === 1 ? ' room lit up' : ' rooms lit up'))
+            + (warn ? ' · front door needs a look!' : ' · door locked tight');
+        ]]]
+      custom_fields:
+        weather: |-
+          [[[
+            const w = states['weather.forecast_home'];
+            const t = (w && w.attributes.temperature != null) ? Math.round(w.attributes.temperature) + '°' : '';
+            const url = '/local/slime-icons/cloud-sun.svg?v=1';
+            return '<span style="display:inline-flex;align-items:center;gap:6px"><span style="display:inline-block;width:20px;height:20px;background:currentColor;-webkit-mask:url(' + url + ') center/contain no-repeat;mask:url(' + url + ') center/contain no-repeat"></span>' + t + '</span>';
+          ]]]
+      styles:
+        grid:
+        - grid-template-areas: '"n weather" "l l"'
+        - grid-template-columns: 1fr auto
+        - row-gap: 6px
+        card:
+        - background: var(--slime-header-bg)
+        - border: none
+        - border-radius: 0
+        - box-shadow: none
+        - padding: 22px 18px 6px 18px
+        - margin-bottom: 34px
+        - overflow: visible
+        name:
+        - font-family: '"Luckiest Guy", cursive'
+        - font-size: 40px
+        - line-height: 1
+        - justify-self: start
+        - transform: rotate(-2deg)
+        - color: var(--slime-header-text)
+        label:
+        - font-weight: 800
+        - font-size: 16px
+        - justify-self: start
+        - color: var(--slime-header-text)
+        custom_fields:
+          weather:
+          - background: var(--slime-chip-bg)
+          - border: 3px solid var(--slime-ink)
+          - border-radius: 999px
+          - box-shadow: 3px 3px 0 var(--slime-ink)
+          - padding: 4px 12px
+          - font-weight: 900
+          - font-size: 15px
+          - color: var(--slime-tile-text)
+      extra_styles: |
+        ha-card::before, ha-card::after { content: ''; position: absolute; left: 0; right: 0; height: 40px; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 40' preserveAspectRatio='none'%3E%3Cpath d='M0 0H390V12C372 12 370 32 358 32C346 32 348 12 332 12H262C248 12 250 38 234 38C218 38 222 12 206 12H122C108 12 110 28 98 28C86 28 88 12 74 12H40C30 12 32 22 24 22C16 22 18 12 8 12H0Z'/%3E%3C/svg%3E") no-repeat 0 0 / 100% 100%; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 40' preserveAspectRatio='none'%3E%3Cpath d='M0 0H390V12C372 12 370 32 358 32C346 32 348 12 332 12H262C248 12 250 38 234 38C218 38 222 12 206 12H122C108 12 110 28 98 28C86 28 88 12 74 12H40C30 12 32 22 24 22C16 22 18 12 8 12H0Z'/%3E%3C/svg%3E") no-repeat 0 0 / 100% 100%; }
+        ha-card::before { bottom: -37px; background: var(--slime-ink); }
+        ha-card::after  { bottom: -34px; background: var(--slime-header-bg); }
+    - type: horizontal-stack
+      cards:
+      - type: custom:button-card
+        template: slime_scene
+        name: Lights Out
+        tap_action:
+          action: perform-action
+          perform_action: light.turn_off
+          target:
+            entity_id:
+            - light.living_room
+            - light.kitchen
+            - light.bedroom
+            - light.office
+            - light.basement
+            - light.stairs
+          confirmation:
+            text: Turn off every room?
+        styles:
+          card:
+          - background: var(--slime-scene-1)
+          - border-radius: 16px 12px 18px 10px
+          - transform: rotate(-1.5deg)
+      - type: custom:button-card
+        template: slime_scene
+        name: Bedtime
+        tap_action:
+          action: perform-action
+          perform_action: scene.turn_on
+          target:
+            entity_id: scene.bedtime
+        styles:
+          card:
+          - background: var(--slime-scene-2)
+          - border-radius: 12px 18px 10px 16px
+          - transform: rotate(1deg)
+      - type: custom:button-card
+        template: slime_scene
+        name: Lock Up
+        tap_action:
+          action: perform-action
+          perform_action: lock.lock
+          target:
+            entity_id: lock.front_door
+        styles:
+          card:
+          - background: var(--slime-scene-3)
+          - border-radius: 18px 10px 16px 12px
+          - transform: rotate(-0.8deg)
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+      - type: custom:button-card
+        template: slime_light
+        entity: light.living_room
+        name: Living Room
+        styles:
+          card:
+          - transform: rotate(-1.5deg)
+      - type: custom:button-card
+        template: slime_light
+        entity: light.kitchen
+        name: Kitchen
+        styles:
+          card:
+          - transform: rotate(1.2deg)
+      - type: custom:button-card
+        template: slime_light
+        entity: light.bedroom
+        name: Bedroom
+        styles:
+          card:
+          - transform: rotate(1deg)
+      - type: custom:button-card
+        template: slime_light
+        entity: light.office
+        name: Office
+        styles:
+          card:
+          - transform: rotate(-1deg)
+      - type: custom:button-card
+        template: slime_light
+        entity: light.basement
+        name: Basement
+        styles:
+          card:
+          - transform: rotate(-0.8deg)
+      - type: custom:button-card
+        template: slime_light
+        entity: light.stairs
+        name: Basement Stairs
+        styles:
+          card:
+          - transform: rotate(1.3deg)
+      - type: custom:button-card
+        template: slime_guard
+        entity: lock.front_door
+        name: Front Door
+        styles:
+          card:
+          - transform: rotate(1deg)
+      - type: custom:button-card
+        template: slime_tile
+        entity: climate.living_room
+        name: Thermostat
+        show_state: false
+        show_label: true
+        tap_action:
+          action: more-info
+        label: |
+          [[[ return (entity.attributes.current_temperature ?? '–') + '°'; ]]]
+        styles:
+          grid:
+          - grid-template-areas: '"ico" "n" "l"'
+          card:
+          - background: var(--slime-warm-bg)
+          - transform: rotate(-1.4deg)
+          - border-radius: 16px 24px 14px 22px
+          label:
+          - font-family: '"Luckiest Guy", cursive'
+          - font-size: 26px
+          - justify-self: start
+        variables:
+          icon: thermo

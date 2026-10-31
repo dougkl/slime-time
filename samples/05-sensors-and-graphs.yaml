@@ -1,0 +1,43 @@
+# Sample: cartoon sensor tiles and a chunky, smoothed history graph (mini-graph-card).
+# Colors used by the converted dashboards: temperature #7DCB1A, humidity #4FB3D9, extras #E07A1F / #B79CFF.
+
+type: vertical-stack
+cards:
+- type: heading
+  heading: Fridge
+  icon: slime:fridge
+- type: grid
+  columns: 2
+  square: false
+  cards:
+  - type: custom:button-card
+    template: slime_sensor
+    entity: sensor.fridge_temperature
+    name: Fridge
+    variables:
+      icon: thermo
+  - type: custom:button-card
+    template: slime_sensor
+    entity: sensor.fridge_humidity
+    name: Fridge humidity
+    variables:
+      icon: drop
+- type: custom:mini-graph-card
+  icon: slime:thermo
+  hours_to_show: 24
+  points_per_hour: 4
+  line_width: 5
+  smoothing: true
+  animate: true
+  font_size: 80
+  decimals: 1
+  entities:
+  - entity: sensor.fridge_temperature
+    color: '#7DCB1A'
+  show:
+    fill: fade
+    points: false
+    labels: true
+    extrema: true
+    legend: false
+    icon: true

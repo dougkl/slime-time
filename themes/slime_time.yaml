@@ -1,0 +1,123 @@
+Slime Time:
+  ha-card-border-width: 3px
+  ha-card-border-radius: 22px 16px 24px 14px
+  primary-font-family: Nunito, system-ui, sans-serif
+  paper-font-common-base_-_font-family: Nunito, system-ui, sans-serif
+  modes:
+    light:
+      primary-color: '#8BE000'
+      accent-color: '#FF8A1F'
+      light-primary-color: '#C6F27A'
+      dark-primary-color: '#5E9C00'
+      lovelace-background: '#5B21B6'
+      primary-background-color: '#F3EDFF'
+      secondary-background-color: '#E6DBFF'
+      card-background-color: '#FFFFFF'
+      ha-card-background: '#FFFFFF'
+      primary-text-color: '#111111'
+      secondary-text-color: '#3B3B3B'
+      text-primary-color: '#111111'
+      ha-card-border-color: '#111111'
+      ha-card-box-shadow: '5px 5px 0 #111111'
+      app-header-background-color: '#8BE000'
+      app-header-text-color: '#111111'
+      sidebar-background-color: '#4C1D95'
+      sidebar-text-color: '#FFFFFF'
+      sidebar-icon-color: '#FFFFFF'
+      sidebar-selected-text-color: '#8BE000'
+      sidebar-selected-icon-color: '#8BE000'
+      divider-color: '#111111'
+      state-icon-color: '#111111'
+      state-active-color: '#5E9C00'
+      state-light-on-color: '#5E9C00'
+      state-lock-locked-color: '#5E9C00'
+      state-lock-unlocked-color: '#FF8A1F'
+      switch-checked-color: '#8BE000'
+      slider-color: '#8BE000'
+      slime-ink: '#111111'
+      slime-tile-bg: '#FFFFFF'
+      slime-tile-text: '#111111'
+      slime-bubble-bg: '#FFFFFF'
+      slime-icon: '#111111'
+      slime-on-bg: '#8BE000'
+      slime-on-icon: '#111111'
+      slime-alert-bg: '#FF8A1F'
+      slime-header-bg: '#8BE000'
+      slime-header-text: '#111111'
+      slime-chip-bg: '#FFFFFF'
+      slime-scene-1: '#FF8A1F'
+      slime-scene-2: '#FFE14D'
+      slime-scene-3: '#5BD8F5'
+      slime-scene-text: '#111111'
+      slime-warm-bg: '#FFE14D'
+    dark:
+      primary-color: '#7DCB1A'
+      accent-color: '#E07A1F'
+      light-primary-color: '#4F8A14'
+      dark-primary-color: '#2E5A12'
+      lovelace-background: '#160A2E'
+      primary-background-color: '#120824'
+      secondary-background-color: '#1C0F38'
+      card-background-color: '#24133F'
+      ha-card-background: '#24133F'
+      primary-text-color: '#EDE6FF'
+      secondary-text-color: '#B9ADD6'
+      text-primary-color: '#EDE6FF'
+      ha-card-border-color: '#05020C'
+      ha-card-box-shadow: '5px 5px 0 #05020C'
+      app-header-background-color: '#1C0F38'
+      app-header-text-color: '#A6F04A'
+      sidebar-background-color: '#120824'
+      sidebar-text-color: '#D9D0F2'
+      sidebar-icon-color: '#B9ADD6'
+      sidebar-selected-text-color: '#A6F04A'
+      sidebar-selected-icon-color: '#A6F04A'
+      divider-color: '#05020C'
+      state-icon-color: '#CBBEF0'
+      state-active-color: '#A6F04A'
+      state-light-on-color: '#A6F04A'
+      state-lock-locked-color: '#A6F04A'
+      state-lock-unlocked-color: '#E07A1F'
+      switch-checked-color: '#7DCB1A'
+      slider-color: '#7DCB1A'
+      slime-ink: '#05020C'
+      slime-tile-bg: '#24133F'
+      slime-tile-text: '#EDE6FF'
+      slime-bubble-bg: '#160A2E'
+      slime-icon: '#CBBEF0'
+      slime-on-bg: '#2E5A12'
+      slime-on-icon: '#A6F04A'
+      slime-alert-bg: '#7A3A0C'
+      slime-header-bg: '#2E5A12'
+      slime-header-text: '#EDE6FF'
+      slime-chip-bg: '#160A2E'
+      slime-scene-1: '#7A3A0C'
+      slime-scene-2: '#5E4C0A'
+      slime-scene-3: '#0E4A5C'
+      slime-scene-text: '#EDE6FF'
+      slime-warm-bg: '#5E4C0A'
+  ha-font-family-body: Nunito, system-ui, sans-serif
+  ha-font-family-heading: '"Luckiest Guy", Nunito, system-ui, sans-serif'
+  ha-font-weight-medium: '800'
+  ha-font-weight-bold: '900'
+  card-mod-theme: Slime Time
+  card-mod-card-yaml: ".: |\n  @keyframes slime-boing {\n    0%, 100% { transform:\
+    \ translateY(0) scale(1, 1); }\n    30% { transform: translateY(-4px) scale(.92,\
+    \ 1.08); }\n    55% { transform: translateY(0) scale(1.08, .92); }\n    75% {\
+    \ transform: translateY(-1px) scale(1, 1); }\n  }\n  ha-card {\n    transition:\
+    \ background 0.25s ease;\n  }\n  ha-card.active {\n    background: var(--slime-on-bg)\
+    \ !important;\n    --tile-color: var(--slime-on-icon) !important;\n    color:\
+    \ var(--slime-tile-text);\n  }\n  ha-tile-icon {\n    --tile-icon-border-radius:\
+    \ 50%;\n    --tile-icon-opacity: 1;\n    --tile-icon-hover-opacity: 1;\n    --tile-icon-color:\
+    \ var(--slime-bubble-bg);\n    --tile-icon-size: 26px;\n    color: var(--slime-icon);\n\
+    \  }\n  ha-card.active ha-tile-icon {\n    --tile-icon-color: var(--slime-bubble-bg);\n\
+    \    color: var(--slime-on-icon);\n    animation: slime-boing 1.3s ease-in-out\
+    \ infinite;\n    transform-origin: 50% 100%;\n  }\n  @media (prefers-reduced-motion:\
+    \ reduce) { ha-tile-icon { animation: none !important; } }\nha-tile-icon$: |\n\
+    \  .container {\n    border: 3px solid var(--slime-ink);\n    box-sizing: border-box;\n\
+    \    box-shadow: 2px 2px 0 var(--slime-ink);\n  }\nha-tile-info$: |\n  .primary\
+    \ {\n    font-weight: 900;\n    color: var(--slime-tile-text);\n  }\n  .secondary\
+    \ {\n    font-family: \"Luckiest Guy\", Nunito, sans-serif;\n    font-size: 15px;\n\
+    \    letter-spacing: 0.5px;\n    color: var(--slime-tile-text);\n    opacity:\
+    \ 0.9;\n  }\n"
+

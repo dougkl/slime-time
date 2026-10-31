@@ -1,0 +1,45 @@
+# Sample: cartoon toggle rows with a chunky ON/OFF pill. Works for lights, switches and media players.
+# Tap = toggle, hold = more-info. The second part builds a row for every light automatically
+# (needs auto-entities; note card_param: cards, which is required when the inner card is a grid).
+
+type: vertical-stack
+cards:
+- type: vertical-stack
+  cards:
+  - type: heading
+    heading: Quick toggles
+  - type: custom:button-card
+    template: slime_row
+    entity: light.bedroom
+    name: Bedroom lights
+  - type: custom:button-card
+    template: slime_row
+    entity: light.living_room
+    name: Living room lights
+  - type: custom:button-card
+    template: slime_row
+    entity: switch.desk_fan
+    name: Desk fan socket
+  - type: custom:button-card
+    template: slime_row
+    entity: media_player.living_room_tv
+    name: Living room TV
+- type: heading
+  heading: Every light (auto-entities)
+- type: custom:auto-entities
+  card:
+    type: grid
+    columns: 1
+    square: false
+  card_param: cards
+  sort:
+    method: name
+  filter:
+    include:
+    - domain: light
+      options:
+        type: custom:button-card
+        template: slime_row
+    exclude:
+    - state: unavailable
+    - state: unknown
