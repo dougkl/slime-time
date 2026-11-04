@@ -74,7 +74,7 @@ easy on the eyes** (deep purples and moss greens, nothing neon) and a bright lig
 | [`02-home-dashboard.yaml`](samples/02-home-dashboard.yaml) | A full home dashboard: dripping header with a live summary, quick-action buttons, room tiles |
 | [`03-toggle-rows.yaml`](samples/03-toggle-rows.yaml) | Full-width rows with a chunky ON/OFF pill, plus an auto-built list of every light |
 | [`04-thermostat.yaml`](samples/04-thermostat.yaml) | Cartoon thermostat: dial, giant set-point, ± buttons, mode/fan/eco pills, temperature graph |
-| [`05-sensors-and-graphs.yaml`](samples/05-sensors-and-graphs.yaml) | Temperature/humidity tiles and a thick, smoothed history graph |
+| [`05-sensors-and-graphs.yaml`](samples/05-sensors-and-graphs.yaml) | Temperature, humidity and CO2 tiles (CO2 goes green, mustard, orange by level) with thick, smoothed graphs |
 | [`06-icons-on-standard-cards.yaml`](samples/06-icons-on-standard-cards.yaml) | Only the icon pack, on Home Assistant's own tile cards |
 
 Each sample uses example entity ids (`light.living_room`, `lock.front_door`, `climate.living_room`...),

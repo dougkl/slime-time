@@ -1,4 +1,4 @@
-# Sample: cartoon sensor tiles and a chunky, smoothed history graph (mini-graph-card).
+# Sample: cartoon sensor tiles (temperature, humidity, CO2) and a chunky, smoothed history graph (mini-graph-card).
 # Colors used by the converted dashboards: temperature #7DCB1A, humidity #4FB3D9, extras #E07A1F / #B79CFF.
 
 type: vertical-stack
@@ -41,3 +41,40 @@ cards:
     extrema: true
     legend: false
     icon: true
+- type: heading
+  heading: Office air
+  icon: slime:cloud
+- type: grid
+  columns: 2
+  square: false
+  cards:
+  - type: custom:button-card
+    template: slime_co2
+    entity: sensor.office_co2
+    name: Office CO2
+- type: custom:mini-graph-card
+  name: Office CO2
+  icon: slime:cloud
+  hours_to_show: 24
+  points_per_hour: 4
+  line_width: 5
+  smoothing: true
+  animate: true
+  decimals: 0
+  entities:
+  - entity: sensor.office_co2
+    name: CO2
+  color_thresholds:
+  - value: 0
+    color: '#7DCB1A'
+  - value: 1000
+    color: '#C9A227'
+  - value: 1500
+    color: '#E07A1F'
+  color_thresholds_transition: hard
+  show:
+    fill: fade
+    points: false
+    labels: true
+    extrema: true
+    legend: false
