@@ -17,6 +17,7 @@ easy on the eyes** (deep purples and moss greens, nothing neon) and a bright lig
 | `themes/slime_time.yaml` | The theme (light + dark modes), with card-mod styling for standard tile cards |
 | `button_card_templates/slime_templates.yaml` | The cartoon cards: tiles, toggle rows, sensors, lock/garage, scene buttons, thermostat parts |
 | `icons/slime-icons.js` | Icon pack: use `slime:bulb`, `slime:sofa`, `slime:fridge`... anywhere HA takes an icon |
+| `icons/slime-cards.js` | The cartoon brightness slider (`custom:slime-slider-card`) used on light tiles |
 | `icons/svg/` | The same drawings as stroke SVGs (used by the cartoon cards' animated icon bubbles) |
 | `samples/` | Ready-to-paste dashboards and cards |
 | `tools/` | The icon source drawings and the script that builds the icon pack |
@@ -43,13 +44,14 @@ easy on the eyes** (deep purples and moss greens, nothing neon) and a bright lig
    ```
    Restart, or run the `frontend.reload_themes` action.
 
-2. **Icons**: copy the `icons/` folder to `/config/www/slime-icons/` so you have
-   `/config/www/slime-icons/slime-icons.js` and `/config/www/slime-icons/*.svg`.
+2. **Icons and slider**: copy the `icons/` folder to `/config/www/slime-icons/` so you have
+   `/config/www/slime-icons/slime-icons.js`, `/config/www/slime-icons/slime-cards.js` and `/config/www/slime-icons/*.svg`.
 
 3. **Resources** (Settings → Dashboards → ⋮ → Resources):
    | URL | Type |
    |---|---|
    | `/local/slime-icons/slime-icons.js` | JavaScript module |
+   | `/local/slime-icons/slime-cards.js` | JavaScript module |
    | `https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@700;800;900&display=swap` | Stylesheet |
 
 4. **Templates**: open your dashboard → ✏️ → ⋮ → *Raw configuration editor* and paste the
@@ -83,6 +85,13 @@ so swap in your own. Add a single card with *Add card → Manual*, or paste a wh
 
 - **Lights / outlets / fans**: tap to toggle, hold for details. On = slime-green tile, glowing icon, a little bounce.
   Light groups show "2 of 4 on"; single lights show their brightness.
+- **Brightness slider**: dimmable lights get a chunky slider on the tile. Drag it (or use the arrow keys) to set the
+  brightness; dragging an off light turns it on at that level, and the slider never toggles the tile.
+  It also works as a standalone card:
+  ```yaml
+  type: custom:slime-slider-card
+  entity: light.living_room
+  ```
 - **Locks / garage**: green when locked/closed; orange and wiggling when unlocked/open. Tapping opens details
   instead of toggling, so nothing unlocks by accident.
 - **Toggle rows** work for lights, switches and media players (TVs and speakers show what's playing).

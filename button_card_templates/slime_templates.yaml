@@ -1,19 +1,5 @@
 # Slime Time button-card templates
-# Paste the `button_card_templates:` block at the TOP of your dashboard's raw configuration
-# (Dashboard > Edit > three dots > Raw configuration editor). Every sample in /samples uses these.
-#
-#   slime_tile       base cartoon tile (outline, wobbly corners, sticker shadow, icon bubble)
-#   slime_light      light or light group; turns slime-green and bounces when on; "2 of 4 on" for groups
-#   slime_switch     outlet / switch
-#   slime_fan        fan; icon spins when on
-#   slime_guard      lock or garage/cover; green when safe, orange + wiggle when unlocked/open
-#   slime_sensor     temperature / humidity reading with big cartoon numbers
-#   slime_row        full-width toggle row with a chunky ON/OFF pill (lights, switches, media players)
-#   slime_scene      quick-action button
-#   slime_pill       small pill button (used by the thermostat)
-#   slime_round_btn  round +/- button (used by the thermostat)
-
-button_card_templates:
+# Paste the `button_card_templates:
   slime_tile:
     show_name: true
     show_state: true
@@ -106,13 +92,18 @@ button_card_templates:
       ]]]
     styles:
       grid:
-      - grid-template-rows: min-content min-content min-content min-content
-      - grid-template-areas: '"ico" "n" "s" "l"'
+      - grid-template-areas: '"ico" "n" "s" "l" "dim"'
+      - grid-template-rows: min-content min-content min-content min-content min-content
       label:
       - font-weight: 800
       - font-size: 13px
       - justify-self: start
       - opacity: 0.8
+      custom_fields:
+        dim:
+        - justify-self: stretch
+        - width: 100%
+        - margin-top: 10px
     state:
     - value: 'on'
       styles:
@@ -125,6 +116,11 @@ button_card_templates:
       icon: bulb
       icon_alt: bulb-on
       anim_on: boing
+    custom_fields:
+      dim:
+        card:
+          type: custom:slime-slider-card
+          entity: '[[[ return entity.entity_id; ]]]'
   slime_fan:
     template: slime_tile
     state:
